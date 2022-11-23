@@ -100,10 +100,7 @@ def check_can_edit_skill_description(user: user_domain.UserActionsInfo) -> bool:
         bool. Whether the given user can edit skill descriptions.
     """
 
-    if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in user.actions:
-        return False
-    else:
-        return True
+    return role_services.ACTION_EDIT_SKILL_DESCRIPTION in user.actions
 
 
 class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -223,11 +220,15 @@ class EditableSkillDataHandler(
         for topic in topics:
             skill_ids_in_topic = topic.get_all_skill_ids()
             if skill_id in skill_ids_in_topic:
-                subtopic_name = None
-                for subtopic in topic.subtopics:
-                    if skill_id in subtopic.skill_ids:
-                        subtopic_name = subtopic.title
-                        break
+                subtopic_name = next(
+                    (
+                        subtopic.title
+                        for subtopic in topic.subtopics
+                        if skill_id in subtopic.skill_ids
+                    ),
+                    None,
+                )
+
                 assigned_skill_topic_data_dict[topic.name] = subtopic_name
 
             skill_summaries = skill_services.get_multi_skill_summaries(
@@ -261,8 +262,9 @@ class EditableSkillDataHandler(
         if (commit_message is not None and
                 len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH):
             raise self.InvalidInputException(
-                'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH)
+                f'Commit messages must be at most {constants.MAX_COMMIT_MESSAGE_LENGTH} characters long.'
+            )
+
 
         change_list = self.normalized_payload['change_dicts']
         try:

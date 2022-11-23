@@ -57,10 +57,10 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            params={
-                'selected_skill_ids': json.dumps(skill_ids)
-            })
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            params={'selected_skill_ids': json.dumps(skill_ids)},
+        )
+
         degrees_of_mastery = {
             self.skill_id_1: self.degree_of_mastery_1,
             self.skill_id_2: self.degree_of_mastery_2
@@ -78,10 +78,10 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            params={
-                'selected_skill_ids': json.dumps(skill_ids)
-            })
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            params={'selected_skill_ids': json.dumps(skill_ids)},
+        )
+
         degrees_of_mastery = {
             self.skill_id_1: self.degree_of_mastery_1,
             self.skill_id_2: None
@@ -94,8 +94,9 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
     def test_get_with_no_skill_ids_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            expected_status_int=400)
+            f'{feconf.SKILL_MASTERY_DATA_URL}', expected_status_int=400
+        )
+
 
         self.assertEqual(
             json_response['error'],
@@ -108,10 +109,11 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            params={
-                'selected_skill_ids': json.dumps(skill_ids)
-            }, expected_status_int=400)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            params={'selected_skill_ids': json.dumps(skill_ids)},
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             json_response['error'],
@@ -125,10 +127,11 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            params={
-                'selected_skill_ids': json.dumps(skill_ids)
-            }, expected_status_int=404)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            params={'selected_skill_ids': json.dumps(skill_ids)},
+            expected_status_int=404,
+        )
+
 
         self.logout()
 
@@ -138,18 +141,17 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_2, self.degree_of_mastery_2)
 
-        payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.3,
             self.skill_id_2: -0.3
         }
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token)
+            f'{feconf.SKILL_MASTERY_DATA_URL}', payload, csrf_token=csrf_token
+        )
+
 
         degrees_of_mastery = {
             self.skill_id_1: 0.6,
@@ -167,18 +169,17 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, self.degree_of_mastery_1)
 
-        payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.3,
             self.skill_id_2: 0.3
         }
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token)
+            f'{feconf.SKILL_MASTERY_DATA_URL}', payload, csrf_token=csrf_token
+        )
+
 
         degrees_of_mastery = {
             self.skill_id_1: 0.6,
@@ -198,18 +199,17 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_2, self.degree_of_mastery_2)
 
-        payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: -0.5,
             self.skill_id_2: 0.3
         }
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token)
+            f'{feconf.SKILL_MASTERY_DATA_URL}', payload, csrf_token=csrf_token
+        )
+
 
         degrees_of_mastery = {
             self.skill_id_1: 0.0,
@@ -229,18 +229,17 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_2, self.degree_of_mastery_2)
 
-        payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.9,
             self.skill_id_2: 0.3
         }
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token)
+            f'{feconf.SKILL_MASTERY_DATA_URL}', payload, csrf_token=csrf_token
+        )
+
 
         degrees_of_mastery = {
             self.skill_id_1: 1.0,
@@ -255,21 +254,24 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_with_invalid_type_returns_400(self) -> None:
-        payload = {}
         mastery_change_per_skill = [self.skill_id_1, self.skill_id_2]
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         json_response = self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=400)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             json_response['error'],
-            'Schema validation for \'mastery_change_per_skill\' failed: ' +
-            'Expected dict, received %s' % (mastery_change_per_skill)
+            'Schema validation for \'mastery_change_per_skill\' failed: '
+            + f'Expected dict, received {mastery_change_per_skill}',
         )
+
 
         self.logout()
 
@@ -279,8 +281,12 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         json_response = self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=400)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             json_response['error'],
@@ -290,17 +296,19 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_with_invalid_skill_ids_returns_400(self) -> None:
-        payload = {}
         mastery_change_per_skill = {
             'invalid_skill_id': 0.3
         }
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         json_response = self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=400)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             json_response['error'], 'Invalid skill ID invalid_skill_id')
@@ -309,37 +317,41 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
     def test_put_with_nonexistent_skill_ids_returns_404(self) -> None:
         skill_id_3 = skill_services.get_new_skill_id()
-        payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.3,
             self.skill_id_2: 0.5,
             skill_id_3: 0.6
         }
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=404)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=404,
+        )
+
 
         self.logout()
 
     def test_put_with_invalid_type_of_degree_of_mastery_returns_400(
         self
     ) -> None:
-        payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.1,
             self.skill_id_2: {}
         }
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         self.login(self.NEW_USER_EMAIL)
         csrf_token = self.get_new_csrf_token()
         json_response = self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=400)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             json_response['error'],
@@ -353,8 +365,12 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         payload['mastery_change_per_skill'] = mastery_change_per_skill
 
         json_response = self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=400)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             json_response['error'],
@@ -364,17 +380,19 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_put_with_no_logged_in_user_returns_401(self) -> None:
-        payload = {}
         mastery_change_per_skill = {
             self.skill_id_1: 0.3,
             self.skill_id_2: 0.5
         }
-        payload['mastery_change_per_skill'] = mastery_change_per_skill
-
+        payload = {'mastery_change_per_skill': mastery_change_per_skill}
         csrf_token = self.get_new_csrf_token()
         json_response = self.put_json(
-            '%s' % feconf.SKILL_MASTERY_DATA_URL,
-            payload, csrf_token=csrf_token, expected_status_int=401)
+            f'{feconf.SKILL_MASTERY_DATA_URL}',
+            payload,
+            csrf_token=csrf_token,
+            expected_status_int=401,
+        )
+
 
         self.assertEqual(
             json_response['error'],
@@ -538,11 +556,10 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         # First case: One subtopic mastery doesn't exist.
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
-            params={
-                'selected_topic_ids': json.dumps([
-                    topic_id_1, topic_id_2])
-            })
+            f'{feconf.SUBTOPIC_MASTERY_DATA_URL}',
+            params={'selected_topic_ids': json.dumps([topic_id_1, topic_id_2])},
+        )
+
         degrees_of_mastery_1 = {
             u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2
         }
@@ -559,11 +576,10 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_3, self.degree_of_mastery_3)
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
-            params={
-                'selected_topic_ids': json.dumps([
-                    topic_id_1, topic_id_2])
-            })
+            f'{feconf.SUBTOPIC_MASTERY_DATA_URL}',
+            params={'selected_topic_ids': json.dumps([topic_id_1, topic_id_2])},
+        )
+
         degrees_of_mastery_1 = {
             u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
             u'2': self.degree_of_mastery_3
@@ -582,10 +598,10 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_4, self.degree_of_mastery_4)
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL, params={
-                'selected_topic_ids': json.dumps([
-                    topic_id_1, topic_id_2])
-            })
+            f'{feconf.SUBTOPIC_MASTERY_DATA_URL}',
+            params={'selected_topic_ids': json.dumps([topic_id_1, topic_id_2])},
+        )
+
         degrees_of_mastery_1 = {
             u'1': (self.degree_of_mastery_1 + self.degree_of_mastery_2) / 2,
             u'2': self.degree_of_mastery_3
@@ -604,10 +620,11 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
     def test_get_with_invalid_topic_id_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         response_json = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
-            params={
-                'selected_topic_ids': 'invalid_topic_id'
-            }, expected_status_int=400)
+            f'{feconf.SUBTOPIC_MASTERY_DATA_URL}',
+            params={'selected_topic_ids': 'invalid_topic_id'},
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             response_json['error'],
@@ -619,8 +636,9 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
     def test_get_with_no_topic_ids_returns_400(self) -> None:
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
-            '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
-            expected_status_int=400)
+            f'{feconf.SUBTOPIC_MASTERY_DATA_URL}', expected_status_int=400
+        )
+
 
         self.assertEqual(
             json_response['error'],
@@ -634,17 +652,17 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         topic_id_2 = topic_fetchers.get_new_topic_id()
 
         with self.swap_to_always_return(
-            topic_fetchers, 'get_topics_by_ids', [None, 'random_topic']
-        ):
+                topic_fetchers, 'get_topics_by_ids', [None, 'random_topic']
+            ):
             json_response = self.get_json(
-                '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,
+                f'{feconf.SUBTOPIC_MASTERY_DATA_URL}',
                 params={
                     'selected_topic_ids': json.dumps([topic_id_1, topic_id_2])
                 },
-                expected_status_int=400
+                expected_status_int=400,
             )
 
-            self.assertEqual(
-                json_response['error'], 'Invalid topic ID %s' % topic_id_1)
+
+            self.assertEqual(json_response['error'], f'Invalid topic ID {topic_id_1}')
 
         self.logout()

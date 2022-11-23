@@ -126,8 +126,7 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
         self.logout()
 
-        json_response = self.get_json(
-            '%s/%s' % (feconf.CLASSROOM_DATA_HANDLER, 'math'))
+        json_response = self.get_json(f'{feconf.CLASSROOM_DATA_HANDLER}/math')
         topic_summary_dict = (
             topic_fetchers.get_topic_summary_by_id(topic_id_2).to_dict()
         )
@@ -202,9 +201,9 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
 
     def test_get_fails_for_invalid_classroom_name(self) -> None:
         self.get_json(
-            '%s/%s' % (
-                feconf.CLASSROOM_DATA_HANDLER, 'invalid_subject'),
-            expected_status_int=404)
+            f'{feconf.CLASSROOM_DATA_HANDLER}/invalid_subject',
+            expected_status_int=404,
+        )
 
 
 class ClassroomPromosStatusHandlerTests(BaseClassroomControllerTests):
@@ -309,8 +308,10 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_get_classroom_dict(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom_handler_url = '%s/%s' % (
-            feconf.CLASSROOM_HANDLER_URL, self.math_classroom_id)
+        classroom_handler_url = (
+            f'{feconf.CLASSROOM_HANDLER_URL}/{self.math_classroom_id}'
+        )
+
 
         json_response = self.get_json(classroom_handler_url)
 
@@ -320,8 +321,10 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_update_classroom_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom_handler_url = '%s/%s' % (
-            feconf.CLASSROOM_HANDLER_URL, self.physics_classroom_id)
+        classroom_handler_url = (
+            f'{feconf.CLASSROOM_HANDLER_URL}/{self.physics_classroom_id}'
+        )
+
         csrf_token = self.get_new_csrf_token()
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
@@ -335,8 +338,10 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
 
     def test_delete_classroom_data(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom_handler_url = '%s/%s' % (
-            feconf.CLASSROOM_HANDLER_URL, self.physics_classroom_id)
+        classroom_handler_url = (
+            f'{feconf.CLASSROOM_HANDLER_URL}/{self.physics_classroom_id}'
+        )
+
 
         self.delete_json(classroom_handler_url)
         self.get_json(classroom_handler_url, expected_status_int=404)
@@ -346,8 +351,10 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        classroom_handler_url = '%s/%s' % (
-            feconf.CLASSROOM_HANDLER_URL, self.math_classroom_id)
+        classroom_handler_url = (
+            f'{feconf.CLASSROOM_HANDLER_URL}/{self.math_classroom_id}'
+        )
+
         csrf_token = self.get_new_csrf_token()
 
         self.physics_classroom_dict['name'] = 'Quantum physics'
@@ -369,8 +376,10 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         # The classroom with the names ‘math’ and ‘physics’ is already created
         # in the setUp method of the test class.
 
-        classroom_url_fragment_handler_url = '%s/%s' % (
-            feconf.CLASSROOM_URL_FRAGMENT_HANDLER, 'math')
+        classroom_url_fragment_handler_url = (
+            f'{feconf.CLASSROOM_URL_FRAGMENT_HANDLER}/math'
+        )
+
         json_response = self.get_json(classroom_url_fragment_handler_url)
 
         self.assertTrue(json_response['classroom_url_fragment_exists'])
@@ -383,8 +392,10 @@ class ClassroomAdminTests(test_utils.GenericTestBase):
         # The classroom with the names ‘math’ and ‘physics’ is already created
         # in the setUp method of the test class.
 
-        classroom_url_fragment_handler_url = '%s/%s' % (
-            feconf.CLASSROOM_URL_FRAGMENT_HANDLER, 'chemistry')
+        classroom_url_fragment_handler_url = (
+            f'{feconf.CLASSROOM_URL_FRAGMENT_HANDLER}/chemistry'
+        )
+
         json_response = self.get_json(classroom_url_fragment_handler_url)
 
         self.assertFalse(json_response['classroom_url_fragment_exists'])

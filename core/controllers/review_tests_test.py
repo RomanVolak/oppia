@@ -110,22 +110,22 @@ class ReviewTestsPageTests(BaseReviewTestsControllerTests):
 
     def test_any_user_can_access_review_tests_page(self) -> None:
         self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % self.story_url_fragment_1)
+            f'/learn/staging/topic/review-test/{self.story_url_fragment_1}'
+        )
 
     def test_no_user_can_access_unpublished_story_review_sessions_page(
         self
     ) -> None:
         self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % self.story_url_fragment_2,
-            expected_status_int=404)
+            f'/learn/staging/topic/review-test/{self.story_url_fragment_2}',
+            expected_status_int=404,
+        )
 
     def test_get_fails_when_story_doesnt_exist(self) -> None:
         self.get_html_response(
-            '/learn/staging/topic/review-test/%s'
-            % 'non-existent-story',
-            expected_status_int=302)
+            '/learn/staging/topic/review-test/non-existent-story',
+            expected_status_int=302,
+        )
 
 
 class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
@@ -134,9 +134,9 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.story_id_1, self.node_id)
         json_response = self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                self.story_url_fragment_1))
+            f'{feconf.REVIEW_TEST_DATA_URL_PREFIX}/staging/topic/{self.story_url_fragment_1}'
+        )
+
         self.assertEqual(len(json_response['skill_descriptions']), 2)
         self.assertEqual(
             json_response['skill_descriptions']['skill_id_1'],
@@ -149,10 +149,9 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         self
     ) -> None:
         self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                self.story_url_fragment_2),
-            expected_status_int=404)
+            f'{feconf.REVIEW_TEST_DATA_URL_PREFIX}/staging/topic/{self.story_url_fragment_2}',
+            expected_status_int=404,
+        )
 
     def test_get_fails_when_acquired_skills_dont_exist(self) -> None:
         node_id = 'node_1'
@@ -187,21 +186,18 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         story_services.record_completed_node_in_story_context(
             self.viewer_id, self.story_id_3, node_id)
         self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                'public-story-title-two'),
-            expected_status_int=404)
+            f'{feconf.REVIEW_TEST_DATA_URL_PREFIX}/staging/topic/public-story-title-two',
+            expected_status_int=404,
+        )
 
     def test_get_fails_when_story_doesnt_exist(self) -> None:
         self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                'non-existent-story-url-fragment'),
-            expected_status_int=400)
+            f'{feconf.REVIEW_TEST_DATA_URL_PREFIX}/staging/topic/non-existent-story-url-fragment',
+            expected_status_int=400,
+        )
 
     def test_get_fails_when_no_completed_story_node(self) -> None:
         self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                self.story_url_fragment_1),
-            expected_status_int=404)
+            f'{feconf.REVIEW_TEST_DATA_URL_PREFIX}/staging/topic/{self.story_url_fragment_1}',
+            expected_status_int=404,
+        )

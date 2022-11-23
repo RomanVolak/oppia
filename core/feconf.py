@@ -95,8 +95,7 @@ CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 # backend_prod_files contain processed JS and HTML files that are served by
 # Jinja, we are moving away from Jinja so this folder might not be needed later
 # (#6964)
-EXTENSIONS_DIR_PREFIX = (
-    'backend_prod_files' if not constants.DEV_MODE else '')
+EXTENSIONS_DIR_PREFIX = '' if constants.DEV_MODE else 'backend_prod_files'
 ACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
 ISSUES_DIR = (
@@ -169,14 +168,6 @@ class ValidModelNames(enum.Enum):
     TOPIC = 'topic'
     TRANSLATION = 'translation'
     USER = 'user'
-
-
-# A mapping of interaction ids to classifier properties.
-# TODO(#10217): As of now we support only one algorithm per interaction.
-# However, we do have the necessary storage infrastructure to support multiple
-# algorithms per interaction. Hence, whenever we find a secondary algorithm
-# candidate for any of the supported interactions, the logical functions to
-# support multiple algorithms need to be implemented.
 
 
 class ClassifierDict(TypedDict):

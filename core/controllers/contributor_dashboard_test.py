@@ -82,14 +82,18 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         user_services.allow_user_to_review_translation_in_language(
             self.admin_id, 'hi')
 
-        explorations = [self.save_new_valid_exploration(
-            '%s' % i,
-            self.owner_id,
-            title='title %d' % i,
-            category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
-        ) for i in range(3)]
+        explorations = [
+            self.save_new_valid_exploration(
+                f'{i}',
+                self.owner_id,
+                title='title %d' % i,
+                category=constants.ALL_CATEGORIES[i],
+                end_state_name='End State',
+                correctness_feedback_enabled=True,
+            )
+            for i in range(3)
+        ]
+
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -181,20 +185,26 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'admin', 'contributor_dashboard_is_enabled', True)
 
         self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={}, expected_status_int=200)
+            f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill',
+            params={},
+            expected_status_int=200,
+        )
+
 
         config_services.set_property(
             'admin', 'contributor_dashboard_is_enabled', False)
 
         self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={}, expected_status_int=404)
+            f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill',
+            params={},
+            expected_status_int=404,
+        )
 
     def test_get_skill_opportunity_data(self) -> None:
         response = self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={})
+            f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill', params={}
+        )
+
         self.assertEqual(
             response['opportunities'], [
                 self.expected_skill_opportunity_dict_0,
@@ -209,8 +219,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.admin_id, 'classroom_pages_data')
 
         response = self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={})
+            f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill', params={}
+        )
+
 
         self.assertEqual(
             response['opportunities'], [])
@@ -223,8 +234,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic_services.delete_topic(self.admin_id, self.topic_id)
 
         response = self.get_json(
-            '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={})
+            f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill', params={}
+        )
+
 
         self.assertEqual(
             response['opportunities'], [])
@@ -235,8 +247,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self
     ) -> None:
         response = self.get_json(
-            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'hi', 'topic_name': 'topic'})
+            f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/translation',
+            params={'language_code': 'hi', 'topic_name': 'topic'},
+        )
+
 
         self.assertEqual(
             response['opportunities'], [
@@ -248,8 +262,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_skill_opportunity_data_pagination(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={})
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill', params={}
+            )
+
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 response['opportunities'],
@@ -259,8 +274,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             next_cursor = response['next_cursor']
             next_response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'cursor': next_cursor})
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill',
+                params={'cursor': next_cursor},
+            )
+
 
             self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
@@ -271,8 +288,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
             next_cursor = next_response['next_cursor']
             next_response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'cursor': next_cursor})
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill',
+                params={'cursor': next_cursor},
+            )
+
 
             # Skill 2 is not part of a Classroom topic and so its corresponding
             # opportunity is not returned.
@@ -313,8 +332,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # skill_id_4, skill_id_5 to fulfill the page size.
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
             response = self.get_json(
-                '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={})
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/skill', params={}
+            )
+
             self.assertEqual(len(response['opportunities']), 3)
             self.assertEqual(
                 response['opportunities'],
@@ -344,8 +364,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_translation_opportunity_data_pagination(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             response = self.get_json(
-                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                params={'language_code': 'hi', 'topic_name': 'topic'})
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/translation',
+                params={'language_code': 'hi', 'topic_name': 'topic'},
+            )
+
             self.assertEqual(len(response['opportunities']), 1)
             self.assertEqual(
                 response['opportunities'], [self.expected_opportunity_dict_1])
@@ -353,13 +375,14 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertIsInstance(response['next_cursor'], str)
 
             next_response = self.get_json(
-                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/translation',
                 params={
                     'language_code': 'hi',
                     'topic_name': 'topic',
-                    'cursor': response['next_cursor']
-                }
+                    'cursor': response['next_cursor'],
+                },
             )
+
             self.assertEqual(len(next_response['opportunities']), 1)
             self.assertEqual(
                 next_response['opportunities'],
@@ -372,22 +395,26 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
-                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/translation',
                 params={'language_code': 'invalid_lang_code'},
-                expected_status_int=400)
+                expected_status_int=400,
+            )
 
     def test_get_translation_opportunity_without_language_code(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
-                '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-                expected_status_int=400)
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/translation',
+                expected_status_int=400,
+            )
 
     def test_get_translation_opportunities_without_topic_name_returns_all_topics( # pylint: disable=line-too-long
         self
     ) -> None:
         response = self.get_json(
-            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'hi'})
+            f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/translation',
+            params={'language_code': 'hi'},
+        )
+
 
         self.assertEqual(
             response['opportunities'], [
@@ -401,8 +428,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self
     ) -> None:
         response = self.get_json(
-            '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
-            params={'language_code': 'hi', 'topic_name': ''})
+            f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/translation',
+            params={'language_code': 'hi', 'topic_name': ''},
+        )
+
 
         self.assertEqual(
             response['opportunities'], [
@@ -415,9 +444,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_opportunity_for_invalid_opportunity_type(self) -> None:
         with self.swap(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
-                '%s/invalid_opportunity_type' % (
-                    feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
-                expected_status_int=404)
+                f'{feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL}/invalid_opportunity_type',
+                expected_status_int=404,
+            )
 
     def test_get_reviewable_translation_opportunities_returns_in_review_suggestions( # pylint: disable=line-too-long
         self
@@ -438,8 +467,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
+            f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
+            params={'topic_name': 'topic'},
+        )
+
 
         # Should only return opportunities that have corresponding translation
         # suggestions in review (exploration 0).
@@ -469,13 +500,13 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         with self.assertRaisesRegex(
-            Exception,
-            'No exploration_id found for the node_id: node_1'
-        ):
+                Exception,
+                'No exploration_id found for the node_id: node_1'
+            ):
             with swap_with_corrupt_story:
                 self.get_json(
-                    '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-                    params={'topic_name': 'topic'}
+                    f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
+                    params={'topic_name': 'topic'},
                 )
 
     def test_get_reviewable_translation_opportunities_when_state_is_removed(
@@ -525,8 +556,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
+            f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
+            params={'topic_name': 'topic'},
+        )
+
 
         # The newly created translation suggestion with valid exploration
         # content should be returned.
@@ -565,8 +598,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ], 'delete state')
 
         response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
+            f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
+            params={'topic_name': 'topic'},
+        )
+
 
         # After the state is deleted, the corresponding suggestion should not be
         # returned.
@@ -619,8 +654,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
+            f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
+            params={'topic_name': 'topic'},
+        )
+
 
         # Since there was a valid translation suggestion created in the setup,
         # and one suggestion created in this test case, 2 opportunities should
@@ -657,8 +694,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 })], 'Update continue cust args')
 
         response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
+            f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
+            params={'topic_name': 'topic'},
+        )
+
 
         # After the original exploration content is deleted, the corresponding
         # suggestion should not be returned.
@@ -682,7 +721,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             '0', 1, self.owner_id, change_dict, 'description')
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
-        response = self.get_json('%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL)
+        response = self.get_json(f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}')
 
         # Should return all available reviewable opportunities.
         self.assertEqual(
@@ -694,9 +733,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
+            f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
             params={'topic_name': 'Invalid'},
-            expected_status_int=400)
+            expected_status_int=400,
+        )
 
     def test_get_reviewable_translation_opportunities_returns_opportunities_in_story_order( # pylint: disable=line-too-long
         self
@@ -802,8 +842,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
         response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
+            f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
+            params={'topic_name': 'topic'},
+        )
+
 
         # Should return reviewable opportunities in story order.
         self.assertEqual(
@@ -821,8 +863,10 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic_services.publish_story(topic_id, story.id, self.admin_id)
 
         response = self.get_json(
-            '%s' % feconf.REVIEWABLE_OPPORTUNITIES_URL,
-            params={'topic_name': 'topic'})
+            f'{feconf.REVIEWABLE_OPPORTUNITIES_URL}',
+            params={'topic_name': 'topic'},
+        )
+
 
         # Should return reviewable opportunities in new story order.
         self.assertEqual(
@@ -845,7 +889,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic.thumbnail_filename = 'thumbnail.svg'
         topic.thumbnail_bg_color = '#C6DCDA'
         subtopic_id = 1
-        subtopic_skill_id = 'subtopic_skill_id' + topic.id
+        subtopic_skill_id = f'subtopic_skill_id{topic.id}'
         topic.subtopics = [
             topic_domain.Subtopic(
                 subtopic_id, 'Title', [subtopic_skill_id], 'image.svg',
@@ -888,14 +932,18 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
 
-        explorations = [self.save_new_valid_exploration(
-            '%s' % i,
-            self.owner_id,
-            title='title %d' % i,
-            category=constants.ALL_CATEGORIES[i],
-            end_state_name='End State',
-            correctness_feedback_enabled=True
-        ) for i in range(2)]
+        explorations = [
+            self.save_new_valid_exploration(
+                f'{i}',
+                self.owner_id,
+                title='title %d' % i,
+                category=constants.ALL_CATEGORIES[i],
+                end_state_name='End State',
+                correctness_feedback_enabled=True,
+            )
+            for i in range(2)
+        ]
+
 
         for exp in explorations:
             self.publish_exploration(self.owner_id, exp.id)
@@ -914,13 +962,17 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         topic_services.save_new_topic(self.owner_id, topic)
         topic_services.publish_topic(topic.id, self.admin_id)
 
-        stories = [story_domain.Story.create_default_story(
-            '%s' % i,
-            'title %d' % i,
-            'description %d' % i,
-            '0',
-            'title-%s' % chr(97 + i)
-        ) for i in range(2)]
+        stories = [
+            story_domain.Story.create_default_story(
+                f'{i}',
+                'title %d' % i,
+                'description %d' % i,
+                '0',
+                f'title-{chr(97 + i)}',
+            )
+            for i in range(2)
+        ]
+
 
         for index, story in enumerate(stories):
             story.language_code = 'en'
@@ -1483,8 +1535,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
-            '/contributorstatssummaries/translation/submission/%s' % (
-                self.OWNER_USERNAME))
+            f'/contributorstatssummaries/translation/submission/{self.OWNER_USERNAME}'
+        )
+
 
         self.assertEqual(
             response, {
@@ -1528,8 +1581,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
-            '/contributorstatssummaries/translation/review/%s' % (
-                self.OWNER_USERNAME))
+            f'/contributorstatssummaries/translation/review/{self.OWNER_USERNAME}'
+        )
+
 
         self.assertEqual(
             response, {
@@ -1567,8 +1621,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
-            '/contributorstatssummaries/question/submission/%s' % (
-                self.OWNER_USERNAME))
+            f'/contributorstatssummaries/question/submission/{self.OWNER_USERNAME}'
+        )
+
 
         self.assertEqual(
             response, {
@@ -1603,8 +1658,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
-            '/contributorstatssummaries/question/review/%s' % (
-                self.OWNER_USERNAME))
+            f'/contributorstatssummaries/question/review/{self.OWNER_USERNAME}'
+        )
+
 
         self.assertEqual(
             response, {
@@ -1627,8 +1683,10 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.OWNER_EMAIL)
         response = self.get_json(
-            '/contributorstatssummaries/a/review/%s' % (
-                self.OWNER_USERNAME), expected_status_int=400)
+            f'/contributorstatssummaries/a/review/{self.OWNER_USERNAME}',
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             response['error'], 'Invalid contribution type a.')
@@ -1640,8 +1698,10 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.OWNER_EMAIL)
         response = self.get_json(
-            '/contributorstatssummaries/question/a/%s' % (
-                self.OWNER_USERNAME), expected_status_int=400)
+            f'/contributorstatssummaries/question/a/{self.OWNER_USERNAME}',
+            expected_status_int=400,
+        )
+
 
         self.assertEqual(
             response['error'], 'Invalid contribution subtype a.')
@@ -1665,8 +1725,9 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'The user %s is not allowed to fetch the stats of other users.' % (
-                self.OWNER_USERNAME))
+            f'The user {self.OWNER_USERNAME} is not allowed to fetch the stats of other users.',
+        )
+
 
         self.logout()
 
@@ -1769,7 +1830,9 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         with swap_get_stats:
             response = self.get_json(
-                '/contributorallstatssummaries/%s' % self.NEW_USER_USERNAME)
+                f'/contributorallstatssummaries/{self.NEW_USER_USERNAME}'
+            )
+
         self.assertEqual(response, {})
 
     def test_raises_error_if_no_topic_id_associated_with_stats_object(
@@ -1792,19 +1855,20 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(
-            Exception,
-            'No topic_id associated with stats: '
-            'TranslationContributionStats.'
-        ):
+                Exception,
+                'No topic_id associated with stats: '
+                'TranslationContributionStats.'
+            ):
             with swap_with_corrupt_data:
-                self.get_json(
-                    '/contributorallstatssummaries/%s' % self.OWNER_USERNAME)
+                self.get_json(f'/contributorallstatssummaries/{self.OWNER_USERNAME}')
 
     def test_get_all_stats(self) -> None:
         self.login(self.OWNER_EMAIL)
 
         response = self.get_json(
-            '/contributorallstatssummaries/%s' % self.OWNER_USERNAME)
+            f'/contributorallstatssummaries/{self.OWNER_USERNAME}'
+        )
+
 
         self.assertEqual(
             response, {
@@ -1878,7 +1942,8 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'The user %s is not allowed to fetch the stats of other users.' % (
-                self.OWNER_USERNAME))
+            f'The user {self.OWNER_USERNAME} is not allowed to fetch the stats of other users.',
+        )
+
 
         self.logout()

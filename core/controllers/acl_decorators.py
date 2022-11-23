@@ -131,8 +131,8 @@ def is_source_mailchimp(
     # arguments with different types.
     @functools.wraps(handler)
     def test_is_source_mailchimp(
-        self: _SelfBaseHandlerType, secret: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, secret: str, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the request was generated from Mailchimp.
 
         Args:
@@ -145,8 +145,9 @@ def is_source_mailchimp(
         """
         if not email_manager.verify_mailchimp_secret(secret):
             logging.error(
-                'Invalid Mailchimp webhook request received with secret: %s'
-                % secret)
+                f'Invalid Mailchimp webhook request received with secret: {secret}'
+            )
+
             raise self.PageNotFoundException
 
         return handler(self, secret, **kwargs)
@@ -758,8 +759,8 @@ def can_delete_blog_post(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_delete(
-        self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can delete the blog post.
 
         Args:
@@ -790,8 +791,9 @@ def can_delete_blog_post(
             return handler(self, blog_post_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'User %s does not have permissions to delete blog post %s' %
-                (self.user_id, blog_post_id))
+                f'User {self.user_id} does not have permissions to delete blog post {blog_post_id}'
+            )
+
 
     return test_can_delete
 
@@ -813,8 +815,8 @@ def can_edit_blog_post(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_edit(
-        self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, blog_post_id: str, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can edit the blog post.
 
         Args:
@@ -845,8 +847,9 @@ def can_edit_blog_post(
             return handler(self, blog_post_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'User %s does not have permissions to edit blog post %s' %
-                (self.user_id, blog_post_id))
+                f'User {self.user_id} does not have permissions to edit blog post {blog_post_id}'
+            )
+
 
     return test_can_edit
 
@@ -1135,8 +1138,8 @@ def can_access_admin_page(
     # arguments with different types.
     @functools.wraps(handler)
     def test_super_admin(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a super admin.
 
         Args:
@@ -1155,7 +1158,9 @@ def can_access_admin_page(
 
         if not self.current_user_is_super_admin:
             raise self.UnauthorizedUserException(
-                '%s is not a super admin of this application' % self.user_id)
+                f'{self.user_id} is not a super admin of this application'
+            )
+
         return handler(self, **kwargs)
 
     return test_super_admin
@@ -1226,8 +1231,8 @@ def can_manage_contributors_role(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_manage_contributors_role(
-        self: _SelfBaseHandlerType, category: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, category: str, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can modify contributor's role for the contributor
         dashboard page.
 
@@ -1258,8 +1263,7 @@ def can_manage_contributors_role(
                     self.user.actions):
                 return handler(self, category, **kwargs)
         else:
-            raise self.InvalidInputException(
-                'Invalid category: %s' % category)
+            raise self.InvalidInputException(f'Invalid category: {category}')
 
         raise self.UnauthorizedUserException(
             'You do not have credentials to modify contributor\'s role.')
@@ -1284,8 +1288,8 @@ def can_delete_any_user(
     # arguments with different types.
     @functools.wraps(handler)
     def test_primary_admin(
-        self: _SelfBaseHandlerType, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a primary admin e.g. user with
         email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
 
@@ -1305,8 +1309,7 @@ def can_delete_any_user(
 
         email = user_services.get_email_from_user_id(self.user_id)
         if email != feconf.SYSTEM_EMAIL_ADDRESS:
-            raise self.UnauthorizedUserException(
-                '%s cannot delete any user.' % self.user_id)
+            raise self.UnauthorizedUserException(f'{self.user_id} cannot delete any user.')
 
         return handler(self, **kwargs)
 
@@ -1916,11 +1919,11 @@ def can_add_voice_artist(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_add_voice_artist(
-        self: _SelfBaseHandlerType,
-        entity_type: str,
-        entity_id: str,
-        **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType,
+            entity_type: str,
+            entity_id: str,
+            **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can add a voice artist for the given entity.
 
         Args:
@@ -1943,8 +1946,7 @@ def can_add_voice_artist(
             raise base.UserFacingExceptions.NotLoggedInException
 
         if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
-            raise self.InvalidInputException(
-                'Unsupported entity_type: %s' % entity_type)
+            raise self.InvalidInputException(f'Unsupported entity_type: {entity_type}')
 
         exploration_rights = rights_manager.get_exploration_rights(
             entity_id, strict=False)
@@ -1982,11 +1984,11 @@ def can_remove_voice_artist(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_remove_voice_artist(
-        self: _SelfBaseHandlerType,
-        entity_type: str,
-        entity_id: str,
-        **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType,
+            entity_type: str,
+            entity_id: str,
+            **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can remove a voice artist for the given entity.
 
         Args:
@@ -2008,8 +2010,7 @@ def can_remove_voice_artist(
             raise base.UserFacingExceptions.NotLoggedInException
 
         if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
-            raise self.InvalidInputException(
-                'Unsupported entity_type: %s' % entity_type)
+            raise self.InvalidInputException(f'Unsupported entity_type: {entity_type}')
 
         exploration_rights = rights_manager.get_exploration_rights(
             entity_id, strict=False)
@@ -2098,8 +2099,8 @@ def can_delete_exploration(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_delete(
-        self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, exploration_id: str, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user can delete the exploration.
 
         Args:
@@ -2125,8 +2126,9 @@ def can_delete_exploration(
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'User %s does not have permissions to delete exploration %s' %
-                (self.user_id, exploration_id))
+                f'User {self.user_id} does not have permissions to delete exploration {exploration_id}'
+            )
+
 
     return test_can_delete
 
@@ -2879,8 +2881,8 @@ def can_view_question_editor(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_view_question_editor(
-        self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, question_id: str, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can view the question editor.
 
         Args:
@@ -2908,8 +2910,9 @@ def can_view_question_editor(
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                '%s does not have enough rights to access the questions editor'
-                % self.user_id)
+                f'{self.user_id} does not have enough rights to access the questions editor'
+            )
+
 
     return test_can_view_question_editor
 
@@ -3496,8 +3499,8 @@ def can_view_any_topic_editor(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_view_any_topic_editor(
-        self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
+            self: _SelfBaseHandlerType, topic_id: str, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
         """Checks whether the user can view any topic editor.
 
         Args:
@@ -3527,8 +3530,9 @@ def can_view_any_topic_editor(
             return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                '%s does not have enough rights to view any topic editor.'
-                % self.user_id)
+                f'{self.user_id} does not have enough rights to view any topic editor.'
+            )
+
 
     return test_can_view_any_topic_editor
 
@@ -3655,11 +3659,11 @@ def can_access_topic_viewer_page(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
-        self: _SelfBaseHandlerType,
-        classroom_url_fragment: str,
-        topic_url_fragment: str,
-        **kwargs: Any
-    ) -> Optional[_GenericHandlerFunctionReturnType]:
+            self: _SelfBaseHandlerType,
+            classroom_url_fragment: str,
+            topic_url_fragment: str,
+            **kwargs: Any
+        ) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user can access topic viewer page.
 
         Args:
@@ -3677,10 +3681,11 @@ def can_access_topic_viewer_page(
         """
         if topic_url_fragment != topic_url_fragment.lower():
             _redirect_based_on_return_type(
-                self, '/learn/%s/%s' % (
-                    classroom_url_fragment,
-                    topic_url_fragment.lower()),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{classroom_url_fragment}/{topic_url_fragment.lower()}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         topic = topic_fetchers.get_topic_by_url_fragment(
@@ -3688,8 +3693,11 @@ def can_access_topic_viewer_page(
 
         if topic is None:
             _redirect_based_on_return_type(
-                self, '/learn/%s' % classroom_url_fragment,
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{classroom_url_fragment}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         verified_classroom_url_fragment = (
@@ -3698,10 +3706,11 @@ def can_access_topic_viewer_page(
         if classroom_url_fragment != verified_classroom_url_fragment:
             url_substring = topic_url_fragment
             _redirect_based_on_return_type(
-                self, '/learn/%s/%s' % (
-                    verified_classroom_url_fragment,
-                    url_substring),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{verified_classroom_url_fragment}/{url_substring}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         topic_id = topic.id
@@ -3737,13 +3746,13 @@ def can_access_story_viewer_page(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
-        self: _SelfBaseHandlerType,
-        classroom_url_fragment: str,
-        topic_url_fragment: str,
-        story_url_fragment: str,
-        *args: Any,
-        **kwargs: Any
-    ) -> Optional[_GenericHandlerFunctionReturnType]:
+            self: _SelfBaseHandlerType,
+            classroom_url_fragment: str,
+            topic_url_fragment: str,
+            story_url_fragment: str,
+            *args: Any,
+            **kwargs: Any
+        ) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user can access story viewer page.
 
         Args:
@@ -3762,11 +3771,11 @@ def can_access_story_viewer_page(
         """
         if story_url_fragment != story_url_fragment.lower():
             _redirect_based_on_return_type(
-                self, '/learn/%s/%s/story/%s' % (
-                    classroom_url_fragment,
-                    topic_url_fragment,
-                    story_url_fragment.lower()),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{classroom_url_fragment}/{topic_url_fragment}/story/{story_url_fragment.lower()}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
@@ -3774,9 +3783,10 @@ def can_access_story_viewer_page(
         if story is None:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/story' %
-                (classroom_url_fragment, topic_url_fragment),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                f'/learn/{classroom_url_fragment}/{topic_url_fragment}/story',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         story_is_published = False
@@ -3789,24 +3799,23 @@ def can_access_story_viewer_page(
             if topic.url_fragment != topic_url_fragment:
                 _redirect_based_on_return_type(
                     self,
-                    '/learn/%s/%s/story/%s' % (
-                        classroom_url_fragment,
-                        topic.url_fragment,
-                        story_url_fragment),
-                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                    f'/learn/{classroom_url_fragment}/{topic.url_fragment}/story/{story_url_fragment}',
+                    self.GET_HANDLER_ERROR_RETURN_TYPE,
+                )
+
                 return None
 
             verified_classroom_url_fragment = (
                 classroom_services.get_classroom_url_fragment_for_topic_id(
                     topic.id))
             if classroom_url_fragment != verified_classroom_url_fragment:
-                url_substring = '%s/story/%s' % (
-                    topic_url_fragment, story_url_fragment)
+                url_substring = f'{topic_url_fragment}/story/{story_url_fragment}'
                 _redirect_based_on_return_type(
-                    self, '/learn/%s/%s' % (
-                        verified_classroom_url_fragment,
-                        url_substring),
-                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                    self,
+                    f'/learn/{verified_classroom_url_fragment}/{url_substring}',
+                    self.GET_HANDLER_ERROR_RETURN_TYPE,
+                )
+
                 return None
             topic_rights = topic_fetchers.get_topic_rights(topic_id)
             topic_is_published = topic_rights.topic_is_published
@@ -3845,13 +3854,13 @@ def can_access_story_viewer_page_as_logged_in_user(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(
-        self: _SelfBaseHandlerType,
-        classroom_url_fragment: str,
-        topic_url_fragment: str,
-        story_url_fragment: str,
-        *args: Any,
-        **kwargs: Any
-    ) -> Optional[_GenericHandlerFunctionReturnType]:
+            self: _SelfBaseHandlerType,
+            classroom_url_fragment: str,
+            topic_url_fragment: str,
+            story_url_fragment: str,
+            *args: Any,
+            **kwargs: Any
+        ) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user can access story viewer page.
 
         Args:
@@ -3874,11 +3883,11 @@ def can_access_story_viewer_page_as_logged_in_user(
 
         if story_url_fragment != story_url_fragment.lower():
             _redirect_based_on_return_type(
-                self, '/learn/%s/%s/story/%s' % (
-                    classroom_url_fragment,
-                    topic_url_fragment,
-                    story_url_fragment.lower()),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{classroom_url_fragment}/{topic_url_fragment}/story/{story_url_fragment.lower()}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         story = story_fetchers.get_story_by_url_fragment(story_url_fragment)
@@ -3886,9 +3895,10 @@ def can_access_story_viewer_page_as_logged_in_user(
         if story is None:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/story' %
-                (classroom_url_fragment, topic_url_fragment),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                f'/learn/{classroom_url_fragment}/{topic_url_fragment}/story',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         story_is_published = False
@@ -3901,24 +3911,23 @@ def can_access_story_viewer_page_as_logged_in_user(
             if topic.url_fragment != topic_url_fragment:
                 _redirect_based_on_return_type(
                     self,
-                    '/learn/%s/%s/story/%s' % (
-                        classroom_url_fragment,
-                        topic.url_fragment,
-                        story_url_fragment),
-                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                    f'/learn/{classroom_url_fragment}/{topic.url_fragment}/story/{story_url_fragment}',
+                    self.GET_HANDLER_ERROR_RETURN_TYPE,
+                )
+
                 return None
 
             verified_classroom_url_fragment = (
                 classroom_services.get_classroom_url_fragment_for_topic_id(
                     topic.id))
             if classroom_url_fragment != verified_classroom_url_fragment:
-                url_substring = '%s/story/%s' % (
-                    topic_url_fragment, story_url_fragment)
+                url_substring = f'{topic_url_fragment}/story/{story_url_fragment}'
                 _redirect_based_on_return_type(
-                    self, '/learn/%s/%s' % (
-                        verified_classroom_url_fragment,
-                        url_substring),
-                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                    self,
+                    f'/learn/{verified_classroom_url_fragment}/{url_substring}',
+                    self.GET_HANDLER_ERROR_RETURN_TYPE,
+                )
+
                 return None
             topic_rights = topic_fetchers.get_topic_rights(topic_id)
             topic_is_published = topic_rights.topic_is_published
@@ -3956,12 +3965,12 @@ def can_access_subtopic_viewer_page(
     # arguments with different types.
     @functools.wraps(handler)
     def test_can_access(  # pylint: disable=too-many-return-statements
-        self: _SelfBaseHandlerType,
-        classroom_url_fragment: str,
-        topic_url_fragment: str,
-        subtopic_url_fragment: str,
-        **kwargs: Any
-    ) -> Optional[_GenericHandlerFunctionReturnType]:
+            self: _SelfBaseHandlerType,
+            classroom_url_fragment: str,
+            topic_url_fragment: str,
+            subtopic_url_fragment: str,
+            **kwargs: Any
+        ) -> Optional[_GenericHandlerFunctionReturnType]:
         """Checks if the user can access subtopic viewer page.
 
         Args:
@@ -3979,11 +3988,11 @@ def can_access_subtopic_viewer_page(
         """
         if subtopic_url_fragment != subtopic_url_fragment.lower():
             _redirect_based_on_return_type(
-                self, '/learn/%s/%s/revision/%s' % (
-                    classroom_url_fragment,
-                    topic_url_fragment,
-                    subtopic_url_fragment.lower()),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{classroom_url_fragment}/{topic_url_fragment}/revision/{subtopic_url_fragment.lower()}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         topic = topic_fetchers.get_topic_by_url_fragment(topic_url_fragment)
@@ -3991,8 +4000,11 @@ def can_access_subtopic_viewer_page(
 
         if topic is None:
             _redirect_based_on_return_type(
-                self, '/learn/%s' % classroom_url_fragment,
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{classroom_url_fragment}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
@@ -4003,8 +4015,11 @@ def can_access_subtopic_viewer_page(
                 and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE not in
                 user_actions_info.actions):
             _redirect_based_on_return_type(
-                self, '/learn/%s' % classroom_url_fragment,
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{classroom_url_fragment}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         for subtopic in topic.subtopics:
@@ -4014,22 +4029,23 @@ def can_access_subtopic_viewer_page(
         if not subtopic_id:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/revision' %
-                (classroom_url_fragment, topic_url_fragment),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                f'/learn/{classroom_url_fragment}/{topic_url_fragment}/revision',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         verified_classroom_url_fragment = (
             classroom_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
         if classroom_url_fragment != verified_classroom_url_fragment:
-            url_substring = '%s/revision/%s' % (
-                topic_url_fragment, subtopic_url_fragment)
+            url_substring = f'{topic_url_fragment}/revision/{subtopic_url_fragment}'
             _redirect_based_on_return_type(
-                self, '/learn/%s/%s' % (
-                    verified_classroom_url_fragment,
-                    url_substring),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                self,
+                f'/learn/{verified_classroom_url_fragment}/{url_substring}',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
 
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
@@ -4037,9 +4053,10 @@ def can_access_subtopic_viewer_page(
         if subtopic_page is None:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/revision' % (
-                    classroom_url_fragment, topic_url_fragment),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
+                f'/learn/{classroom_url_fragment}/{topic_url_fragment}/revision',
+                self.GET_HANDLER_ERROR_RETURN_TYPE,
+            )
+
             return None
         else:
             return handler(self, topic.name, subtopic_id, **kwargs)

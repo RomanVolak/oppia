@@ -95,8 +95,7 @@ class SkillMasteryDataHandler(
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
         except utils.ValidationError as e:
-            raise self.InvalidInputException(
-                'Invalid skill ID %s' % skill_id) from e
+            raise self.InvalidInputException(f'Invalid skill ID {skill_id}') from e
 
         try:
             skill_fetchers.get_multi_skills(skill_ids)
@@ -130,8 +129,7 @@ class SkillMasteryDataHandler(
             try:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
             except utils.ValidationError as e:
-                raise self.InvalidInputException(
-                    'Invalid skill ID %s' % skill_id) from e
+                raise self.InvalidInputException(f'Invalid skill ID {skill_id}') from e
 
             current_degrees_of_mastery = (
                 current_degrees_of_mastery_dict[skill_id]
@@ -200,8 +198,7 @@ class SubtopicMasteryDataHandler(
         topics = []
         for ind, topic in enumerate(topics_by_ids):
             if not topic:
-                raise self.InvalidInputException(
-                    'Invalid topic ID %s' % topic_ids[ind])
+                raise self.InvalidInputException(f'Invalid topic ID {topic_ids[ind]}')
             all_skill_ids.extend(topic.get_all_skill_ids())
             topics.append(topic)
 
@@ -211,12 +208,11 @@ class SubtopicMasteryDataHandler(
         for topic in topics:
             subtopic_mastery_dict[topic.id] = {}
             for subtopic in topic.subtopics:
-                skill_mastery_dict = {
+                if skill_mastery_dict := {
                     skill_id: mastery
                     for skill_id, mastery in all_skills_mastery_dict.items()
                     if mastery is not None and skill_id in subtopic.skill_ids
-                }
-                if skill_mastery_dict:
+                }:
                     # Subtopic mastery is average of skill masteries.
                     subtopic_mastery_dict[topic.id][subtopic.id] = (
                         sum(skill_mastery_dict.values()) /

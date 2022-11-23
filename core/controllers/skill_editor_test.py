@@ -97,7 +97,7 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
 
     def setUp(self) -> None:
         super().setUp()
-        self.url = '%s/%s' % (feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id)
+        self.url = f'{feconf.SKILL_EDITOR_URL_PREFIX}/{self.skill_id}'
 
     def test_access_skill_editor_page(self) -> None:
         """Test access to editor pages for the sample skill."""
@@ -127,7 +127,7 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
 
     def setUp(self) -> None:
         super().setUp()
-        self.url = '%s/%s' % (feconf.SKILL_RIGHTS_URL_PREFIX, self.skill_id)
+        self.url = f'{feconf.SKILL_RIGHTS_URL_PREFIX}/{self.skill_id}'
 
     def test_skill_rights_handler_succeeds(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -150,8 +150,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def setUp(self) -> None:
         super().setUp()
-        self.url = '%s/%s' % (
-            feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id)
+        self.url = f'{feconf.SKILL_EDITOR_DATA_URL_PREFIX}/{self.skill_id}'
         self.put_payload = {
             'version': 1,
             'commit_message': 'changed description',
@@ -164,8 +163,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         }
 
     def test_cannot_get_skill_by_invalid_skill_id(self) -> None:
-        url_with_invalid_id = '%s/%s' % (
-            feconf.SKILL_EDITOR_DATA_URL_PREFIX, 'invalidSkillId')
+        url_with_invalid_id = f'{feconf.SKILL_EDITOR_DATA_URL_PREFIX}/invalidSkillId'
         self.get_json(url_with_invalid_id, expected_status_int=400)
 
     def test_guest_can_not_delete_skill(self) -> None:
@@ -210,8 +208,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             additional_story_ids=[], uncategorized_skill_ids=[skill_id],
             subtopics=[], next_subtopic_id=1)
 
-        url = '%s/%s' % (
-            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+        url = f'{feconf.SKILL_EDITOR_DATA_URL_PREFIX}/{skill_id}'
 
         json_response = self.get_json(url)
         self.assertEqual(skill_id, json_response['skill']['id'])
@@ -226,8 +223,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.save_new_skill(
             skill_id, self.admin_id, description='DescriptionSkill')
 
-        url = '%s/%s' % (
-            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+        url = f'{feconf.SKILL_EDITOR_DATA_URL_PREFIX}/{skill_id}'
 
         json_response = self.get_json(url)
         self.assertEqual(skill_id, json_response['skill']['id'])
@@ -263,8 +259,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[subtopic], next_subtopic_id=2)
 
-        url = '%s/%s' % (
-            feconf.SKILL_EDITOR_DATA_URL_PREFIX, skill_id)
+        url = f'{feconf.SKILL_EDITOR_DATA_URL_PREFIX}/{skill_id}'
 
         json_response = self.get_json(url)
         self.assertEqual(skill_id, json_response['skill']['id'])
@@ -400,8 +395,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def setUp(self) -> None:
         super().setUp()
-        self.url = '%s/%s,%s' % (
-            feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
+        self.url = f'{feconf.SKILL_DATA_URL_PREFIX}/{self.skill_id},{self.skill_id_2}'
         self.put_payload = {
             'version': 1,
             'commit_message': 'changed description',
@@ -426,8 +420,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check GET returns 404 when cannot get skill by id.
         self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
-        self.url = '%s/1,%s' % (
-            feconf.SKILL_DATA_URL_PREFIX, self.skill_id_2)
+        self.url = f'{feconf.SKILL_DATA_URL_PREFIX}/1,{self.skill_id_2}'
         self.get_json(self.url, expected_status_int=400)
         self.logout()
 
@@ -454,8 +447,7 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
     def setUp(self) -> None:
         super().setUp()
         self.skill_description = 'Adding Fractions'
-        self.url = '%s/%s' % (
-            feconf.SKILL_DESCRIPTION_HANDLER, self.skill_description)
+        self.url = f'{feconf.SKILL_DESCRIPTION_HANDLER}/{self.skill_description}'
 
     def test_skill_description_handler_when_unique(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -477,8 +469,7 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
 
         # Unique skill description does not exist.
         skill_description_2 = 'Subtracting Fractions'
-        url_2 = '%s/%s' % (
-            feconf.SKILL_DESCRIPTION_HANDLER, skill_description_2)
+        url_2 = f'{feconf.SKILL_DESCRIPTION_HANDLER}/{skill_description_2}'
         json_response = self.get_json(url_2)
         self.assertEqual(json_response['skill_description_exists'], False)
 
@@ -511,8 +502,7 @@ class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
     def setUp(self) -> None:
         super().setUp()
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.url = '%s/%s' % (
-            feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER, 'skill_id_1')
+        self.url = f'{feconf.DIAGNOSTIC_TEST_SKILL_ASSIGNMENT_HANDLER}/skill_id_1'
 
         self.topic = topic_domain.Topic.create_default_topic(
             'topic_id', 'topic', 'abbrev', 'description', 'fragm')

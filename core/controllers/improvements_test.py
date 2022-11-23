@@ -160,10 +160,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         Returns:
             str. The URL of the handler.
         """
-        return '%s/%s/%s' % (
-            feconf.IMPROVEMENTS_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
-            self.EXP_ID if exp_id is None else exp_id)
+        return f'{feconf.IMPROVEMENTS_URL_PREFIX}/{constants.TASK_ENTITY_TYPE_EXPLORATION}/{self.EXP_ID if exp_id is None else exp_id}'
 
     def test_get_with_invalid_exploration_returns_invalid_input_page(
         self
@@ -531,12 +528,10 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         Returns:
             str. The URL of the handler.
         """
-        url = '%s/%s/%s' % (
-            feconf.IMPROVEMENTS_HISTORY_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
-            self.EXP_ID if exp_id is None else exp_id)
+        url = f'{feconf.IMPROVEMENTS_HISTORY_URL_PREFIX}/{constants.TASK_ENTITY_TYPE_EXPLORATION}/{self.EXP_ID if exp_id is None else exp_id}'
+
         if cursor is not None:
-            url = '%s?cursor=%s' % (url, cursor)
+            url = f'{url}?cursor={cursor}'
         return url
 
     def test_get_with_invalid_exploration_returns_invalid_input_page(
@@ -628,10 +623,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         Returns:
             str. The URL of the handler.
         """
-        return '%s/%s/%s' % (
-            feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
-            self.EXP_ID if exp_id is None else exp_id)
+        return f'{feconf.IMPROVEMENTS_CONFIG_URL_PREFIX}/{constants.TASK_ENTITY_TYPE_EXPLORATION}/{self.EXP_ID if exp_id is None else exp_id}'
 
     def test_get_for_public_exploration_as_non_owning_user_fails(self) -> None:
         self.publish_exploration(self.owner_id, self.EXP_ID)

@@ -325,10 +325,11 @@ class LearnerGroupLearnerProgressHandler(
                 learner_user_ids, learner_group_id
             )
         )
-        learners_with_progress_sharing_on = []
-        for i, user_id in enumerate(learner_user_ids):
-            if progress_sharing_permissions[i]:
-                learners_with_progress_sharing_on.append(user_id)
+        learners_with_progress_sharing_on = [
+            user_id
+            for i, user_id in enumerate(learner_user_ids)
+            if progress_sharing_permissions[i]
+        ]
 
         story_ids = learner_group.story_ids
         stories_progresses = (
@@ -587,16 +588,18 @@ class FacilitatorDashboardHandler(
                 self.user_id)
         )
 
-        learner_groups_data = []
-        for learner_group in learner_groups:
-            learner_groups_data.append({
+        learner_groups_data = [
+            {
                 'id': learner_group.group_id,
                 'title': learner_group.title,
                 'description': learner_group.description,
                 'facilitator_usernames': user_services.get_usernames(
-                    [self.user_id]),
-                'learners_count': len(learner_group.learner_user_ids)
-            })
+                    [self.user_id]
+                ),
+                'learners_count': len(learner_group.learner_user_ids),
+            }
+            for learner_group in learner_groups
+        ]
 
         self.render_json({
             'learner_groups_list': learner_groups_data
@@ -734,11 +737,14 @@ class LearnerGroupSearchLearnerHandler(
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
-            self.render_json({
-                'username': username,
-                'profile_picture_data_url': '',
-                'error': ('User with username %s does not exist.' % username)
-            })
+            self.render_json(
+                {
+                    'username': username,
+                    'profile_picture_data_url': '',
+                    'error': f'User with username {username} does not exist.',
+                }
+            )
+
             return
 
         if self.username.lower() == username.lower():
@@ -796,13 +802,12 @@ class EditLearnerGroupPage(
         if not config_domain.LEARNER_GROUPS_ARE_ENABLED.value:
             raise self.PageNotFoundException
 
-        is_valid_request = learner_group_services.is_user_facilitator(
-            self.user_id, group_id)
-
-        if not is_valid_request:
+        if is_valid_request := learner_group_services.is_user_facilitator(
+            self.user_id, group_id
+        ):
+            self.render_template('edit-learner-group-page.mainpage.html')
+        else:
             raise self.PageNotFoundException
-
-        self.render_template('edit-learner-group-page.mainpage.html')
 
 
 class LearnerGroupLearnersInfoHandler(
@@ -942,9 +947,9 @@ class LearnerGroupLearnerInvitationHandler(
             learner_username)
         if learner_user_id is None:
             raise Exception(
-                'No learner user_id found for the given learner username: %s' %
-                learner_username
+                f'No learner user_id found for the given learner username: {learner_username}'
             )
+
         if is_invitation_accepted:
             learner_group_services.add_learner_to_learner_group(
                 learner_group_id, learner_user_id, progress_sharing_permission)
@@ -1023,9 +1028,9 @@ class ExitLearnerGroupHandler(
             learner_username)
         if learner_user_id is None:
             raise Exception(
-                'No learner user_id found for the given learner username: %s' %
-                learner_username
+                f'No learner user_id found for the given learner username: {learner_username}'
             )
+
         learner_group_services.remove_learners_from_learner_group(
             learner_group_id, [learner_user_id], True)
 
@@ -1098,9 +1103,9 @@ class LearnerStoriesChaptersProgressHandler(
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
             raise Exception(
-                'No learner user_id found for the given learner username: %s' %
-                username
+                f'No learner user_id found for the given learner username: {username}'
             )
+
 
         stories_chapters_progress = (
             story_fetchers.get_user_progress_in_story_chapters(
@@ -1129,31 +1134,35 @@ class LearnerDashboardLearnerGroupsHandler(
             learner_group_fetchers.get_invited_learner_groups_of_learner(
                 self.user_id)
         )
-        invited_to_learner_groups_data = []
-        for learner_group in invited_to_learner_groups:
-            invited_to_learner_groups_data.append({
+        invited_to_learner_groups_data = [
+            {
                 'id': learner_group.group_id,
                 'title': learner_group.title,
                 'description': learner_group.description,
                 'facilitator_usernames': user_services.get_usernames(
-                    learner_group.facilitator_user_ids),
-                'learners_count': len(learner_group.learner_user_ids)
-            })
+                    learner_group.facilitator_user_ids
+                ),
+                'learners_count': len(learner_group.learner_user_ids),
+            }
+            for learner_group in invited_to_learner_groups
+        ]
 
         learner_groups_joined = (
             learner_group_fetchers.get_learner_groups_joined_by_learner(
                 self.user_id)
         )
-        learner_of_learner_groups_data = []
-        for learner_group in learner_groups_joined:
-            learner_of_learner_groups_data.append({
+        learner_of_learner_groups_data = [
+            {
                 'id': learner_group.group_id,
                 'title': learner_group.title,
                 'description': learner_group.description,
                 'facilitator_usernames': user_services.get_usernames(
-                    learner_group.facilitator_user_ids),
-                'learners_count': len(learner_group.learner_user_ids)
-            })
+                    learner_group.facilitator_user_ids
+                ),
+                'learners_count': len(learner_group.learner_user_ids),
+            }
+            for learner_group in learner_groups_joined
+        ]
 
         self.render_json({
             'learner_groups_joined': learner_of_learner_groups_data,

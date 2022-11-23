@@ -327,8 +327,9 @@ class AdminHandler(
                         ' when the action is save_config_properties.'
                     )
                 logging.info(
-                    '[ADMIN] %s saved config property values: %s' %
-                    (self.user_id, new_config_property_values))
+                    f'[ADMIN] {self.user_id} saved config property values: {new_config_property_values}'
+                )
+
                 for (name, value) in new_config_property_values.items():
                     config_services.set_property(self.user_id, name, value)
             elif action == 'revert_config_property':
@@ -340,8 +341,9 @@ class AdminHandler(
                         ' when the action is revert_config_property.'
                     )
                 logging.info(
-                    '[ADMIN] %s reverted config property: %s' %
-                    (self.user_id, config_property_id))
+                    f'[ADMIN] {self.user_id} reverted config property: {config_property_id}'
+                )
+
                 config_services.revert_property(
                     self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
@@ -434,9 +436,7 @@ class AdminHandler(
             Exception. Cannot reload an exploration in production.
         """
         if constants.DEV_MODE:
-            logging.info(
-                '[ADMIN] %s reloaded exploration %s' %
-                (self.user_id, exploration_id))
+            logging.info(f'[ADMIN] {self.user_id} reloaded exploration {exploration_id}')
             exp_services.load_demo(exploration_id)
             rights_manager.release_ownership_of_exploration(
                 user_services.get_system_user(), exploration_id)
@@ -508,11 +508,15 @@ class AdminHandler(
                 True, [], None, None
             )
         )
-        question = question_domain.Question(
-            question_id, state,
+        return question_domain.Question(
+            question_id,
+            state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, linked_skill_ids, [])
-        return question
+            constants.DEFAULT_LANGUAGE_CODE,
+            0,
+            linked_skill_ids,
+            [],
+        )
 
     def _create_dummy_skill(
         self, skill_id: str, skill_description: str, explanation: str
@@ -720,28 +724,27 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
-            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
-                raise Exception(
-                    'User does not have enough rights to generate data.')
-            skill_id = skill_services.get_new_skill_id()
-            skill_name = 'Dummy Skill %s' % str(random.getrandbits(32))
-            skill = self._create_dummy_skill(
-                skill_id, skill_name, '<p>Dummy Explanation 1</p>')
-            skill_services.save_new_skill(self.user_id, skill)
-            for i in range(15):
-                question_id = question_services.get_new_question_id()
-                question_name = 'Question number %s %s' % (str(i), skill_name)
-                question = self._create_dummy_question(
-                    question_id, question_name, [skill_id])
-                question_services.add_question(self.user_id, question)
-                question_difficulty = list(
-                    constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
-                random_difficulty = random.choice(question_difficulty)
-                question_services.create_new_question_skill_link(
-                    self.user_id, question_id, skill_id, random_difficulty)
-        else:
+        if not constants.DEV_MODE:
             raise Exception('Cannot generate dummy skills in production.')
+        if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+            raise Exception(
+                'User does not have enough rights to generate data.')
+        skill_id = skill_services.get_new_skill_id()
+        skill_name = f'Dummy Skill {random.getrandbits(32)}'
+        skill = self._create_dummy_skill(
+            skill_id, skill_name, '<p>Dummy Explanation 1</p>')
+        skill_services.save_new_skill(self.user_id, skill)
+        for i in range(15):
+            question_id = question_services.get_new_question_id()
+            question_name = f'Question number {str(i)} {skill_name}'
+            question = self._create_dummy_question(
+                question_id, question_name, [skill_id])
+            question_services.add_question(self.user_id, question)
+            question_difficulty = list(
+                constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values())
+            random_difficulty = random.choice(question_difficulty)
+            question_services.create_new_question_skill_link(
+                self.user_id, question_id, skill_id, random_difficulty)
 
     def _reload_collection(self, collection_id: str) -> None:
         """Reloads the collection in dev_mode corresponding to the given
@@ -755,9 +758,7 @@ class AdminHandler(
         """
         assert self.user_id is not None
         if constants.DEV_MODE:
-            logging.info(
-                '[ADMIN] %s reloaded collection %s' %
-                (self.user_id, collection_id))
+            logging.info(f'[ADMIN] {self.user_id} reloaded collection {collection_id}')
             collection_services.load_demo(collection_id)
             rights_manager.release_ownership_of_collection(
                 user_services.get_system_user(), collection_id)
@@ -781,8 +782,9 @@ class AdminHandler(
         assert self.user_id is not None
         if constants.DEV_MODE:
             logging.info(
-                '[ADMIN] %s generated %s number of dummy explorations' %
-                (self.user_id, num_dummy_exps_to_generate))
+                f'[ADMIN] {self.user_id} generated {num_dummy_exps_to_generate} number of dummy explorations'
+            )
+
             possible_titles = ['Hulk Neuroscience', 'Quantum Starks',
                                'Wonder Anatomy',
                                'Elvish, language of "Lord of the Rings',
@@ -813,124 +815,122 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
-            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
-                raise Exception(
-                    'User does not have enough rights to generate data.')
-            logging.info(
-                '[ADMIN] %s generated dummy classroom.' % self.user_id)
-
-            topic_id_1 = topic_fetchers.get_new_topic_id()
-            topic_id_2 = topic_fetchers.get_new_topic_id()
-            topic_id_3 = topic_fetchers.get_new_topic_id()
-            topic_id_4 = topic_fetchers.get_new_topic_id()
-            topic_id_5 = topic_fetchers.get_new_topic_id()
-            topic_id_6 = topic_fetchers.get_new_topic_id()
-
-            skill_id_1 = skill_services.get_new_skill_id()
-            skill_id_2 = skill_services.get_new_skill_id()
-            skill_id_3 = skill_services.get_new_skill_id()
-            skill_id_4 = skill_services.get_new_skill_id()
-            skill_id_5 = skill_services.get_new_skill_id()
-            skill_id_6 = skill_services.get_new_skill_id()
-
-            topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Topic1', 'topic-one', 'description', 'fragm')
-            topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Topic2', 'topic-two', 'description', 'fragm')
-            topic_3 = topic_domain.Topic.create_default_topic(
-                topic_id_3, 'Topic3', 'topic-three', 'description', 'fragm')
-            topic_4 = topic_domain.Topic.create_default_topic(
-                topic_id_4, 'Topic4', 'topic-four', 'description', 'fragm')
-            topic_5 = topic_domain.Topic.create_default_topic(
-                topic_id_5, 'Topic5', 'topic-five', 'description', 'fragm')
-            topic_6 = topic_domain.Topic.create_default_topic(
-                topic_id_6, 'Topic6', 'topic-six', 'description', 'fragm')
-
-            skill_1 = self._create_dummy_skill(
-                skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
-            skill_2 = self._create_dummy_skill(
-                skill_id_2, 'Skill2', '<p>Dummy Explanation 2</p>')
-            skill_3 = self._create_dummy_skill(
-                skill_id_3, 'Skill3', '<p>Dummy Explanation 3</p>')
-            skill_4 = self._create_dummy_skill(
-                skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>')
-            skill_5 = self._create_dummy_skill(
-                skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
-            skill_6 = self._create_dummy_skill(
-                skill_id_6, 'Skill6', '<p>Dummy Explanation 6</p>')
-
-            skill_services.save_new_skill(self.user_id, skill_1)
-            skill_services.save_new_skill(self.user_id, skill_2)
-            skill_services.save_new_skill(self.user_id, skill_3)
-            skill_services.save_new_skill(self.user_id, skill_4)
-            skill_services.save_new_skill(self.user_id, skill_5)
-            skill_services.save_new_skill(self.user_id, skill_6)
-
-            topic_1.add_uncategorized_skill_id(skill_id_1)
-            topic_2.add_uncategorized_skill_id(skill_id_2)
-            topic_3.add_uncategorized_skill_id(skill_id_3)
-            topic_4.add_uncategorized_skill_id(skill_id_4)
-            topic_5.add_uncategorized_skill_id(skill_id_5)
-            topic_6.add_uncategorized_skill_id(skill_id_6)
-
-            topic_services.save_new_topic(self.user_id, topic_1)
-            topic_services.save_new_topic(self.user_id, topic_2)
-            topic_services.save_new_topic(self.user_id, topic_3)
-            topic_services.save_new_topic(self.user_id, topic_4)
-            topic_services.save_new_topic(self.user_id, topic_5)
-            topic_services.save_new_topic(self.user_id, topic_6)
-
-            classroom_id_1 = classroom_config_services.get_new_classroom_id()
-            classroom_id_2 = classroom_config_services.get_new_classroom_id()
-
-            classroom_name_1 = 'Dummy Classroom with 5 topics'
-            classroom_name_2 = 'Dummy Classroom with 1 topic'
-
-            classroom_url_fragment_1 = 'first-classroom'
-            classroom_url_fragment_2 = 'second-classroom'
-
-            topic_dependency_for_classroom_1: Dict[str, list[str]] = {
-                topic_id_1: [],
-                topic_id_2: [topic_id_1],
-                topic_id_3: [topic_id_1],
-                topic_id_4: [topic_id_2],
-                topic_id_5: [topic_id_3]
-            }
-            topic_dependency_for_classroom_2: Dict[str, List[str]] = {
-                topic_id_6: []
-            }
-
-            classroom_dict_1: classroom_config_domain.ClassroomDict = {
-                'classroom_id': classroom_id_1,
-                'name': classroom_name_1,
-                'url_fragment': classroom_url_fragment_1,
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_id_to_prerequisite_topic_ids': (
-                    topic_dependency_for_classroom_1)
-            }
-            classroom_dict_2: classroom_config_domain.ClassroomDict = {
-                'classroom_id': classroom_id_2,
-                'name': classroom_name_2,
-                'url_fragment': classroom_url_fragment_2,
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_id_to_prerequisite_topic_ids': (
-                    topic_dependency_for_classroom_2)
-            }
-
-            classroom_1 = classroom_config_domain.Classroom.from_dict(
-                classroom_dict_1)
-            classroom_2 = classroom_config_domain.Classroom.from_dict(
-                classroom_dict_2)
-
-            classroom_config_services.update_or_create_classroom_model(
-                classroom_1)
-            classroom_config_services.update_or_create_classroom_model(
-                classroom_2)
-        else:
+        if not constants.DEV_MODE:
             raise Exception('Cannot generate dummy classroom in production.')
+        if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+            raise Exception(
+                'User does not have enough rights to generate data.')
+        logging.info(f'[ADMIN] {self.user_id} generated dummy classroom.')
+
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        topic_id_3 = topic_fetchers.get_new_topic_id()
+        topic_id_4 = topic_fetchers.get_new_topic_id()
+        topic_id_5 = topic_fetchers.get_new_topic_id()
+        topic_id_6 = topic_fetchers.get_new_topic_id()
+
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_id_2 = skill_services.get_new_skill_id()
+        skill_id_3 = skill_services.get_new_skill_id()
+        skill_id_4 = skill_services.get_new_skill_id()
+        skill_id_5 = skill_services.get_new_skill_id()
+        skill_id_6 = skill_services.get_new_skill_id()
+
+        topic_1 = topic_domain.Topic.create_default_topic(
+            topic_id_1, 'Topic1', 'topic-one', 'description', 'fragm')
+        topic_2 = topic_domain.Topic.create_default_topic(
+            topic_id_2, 'Topic2', 'topic-two', 'description', 'fragm')
+        topic_3 = topic_domain.Topic.create_default_topic(
+            topic_id_3, 'Topic3', 'topic-three', 'description', 'fragm')
+        topic_4 = topic_domain.Topic.create_default_topic(
+            topic_id_4, 'Topic4', 'topic-four', 'description', 'fragm')
+        topic_5 = topic_domain.Topic.create_default_topic(
+            topic_id_5, 'Topic5', 'topic-five', 'description', 'fragm')
+        topic_6 = topic_domain.Topic.create_default_topic(
+            topic_id_6, 'Topic6', 'topic-six', 'description', 'fragm')
+
+        skill_1 = self._create_dummy_skill(
+            skill_id_1, 'Skill1', '<p>Dummy Explanation 1</p>')
+        skill_2 = self._create_dummy_skill(
+            skill_id_2, 'Skill2', '<p>Dummy Explanation 2</p>')
+        skill_3 = self._create_dummy_skill(
+            skill_id_3, 'Skill3', '<p>Dummy Explanation 3</p>')
+        skill_4 = self._create_dummy_skill(
+            skill_id_4, 'Skill4', '<p>Dummy Explanation 4</p>')
+        skill_5 = self._create_dummy_skill(
+            skill_id_5, 'Skill5', '<p>Dummy Explanation 5</p>')
+        skill_6 = self._create_dummy_skill(
+            skill_id_6, 'Skill6', '<p>Dummy Explanation 6</p>')
+
+        skill_services.save_new_skill(self.user_id, skill_1)
+        skill_services.save_new_skill(self.user_id, skill_2)
+        skill_services.save_new_skill(self.user_id, skill_3)
+        skill_services.save_new_skill(self.user_id, skill_4)
+        skill_services.save_new_skill(self.user_id, skill_5)
+        skill_services.save_new_skill(self.user_id, skill_6)
+
+        topic_1.add_uncategorized_skill_id(skill_id_1)
+        topic_2.add_uncategorized_skill_id(skill_id_2)
+        topic_3.add_uncategorized_skill_id(skill_id_3)
+        topic_4.add_uncategorized_skill_id(skill_id_4)
+        topic_5.add_uncategorized_skill_id(skill_id_5)
+        topic_6.add_uncategorized_skill_id(skill_id_6)
+
+        topic_services.save_new_topic(self.user_id, topic_1)
+        topic_services.save_new_topic(self.user_id, topic_2)
+        topic_services.save_new_topic(self.user_id, topic_3)
+        topic_services.save_new_topic(self.user_id, topic_4)
+        topic_services.save_new_topic(self.user_id, topic_5)
+        topic_services.save_new_topic(self.user_id, topic_6)
+
+        classroom_id_1 = classroom_config_services.get_new_classroom_id()
+        classroom_id_2 = classroom_config_services.get_new_classroom_id()
+
+        classroom_name_1 = 'Dummy Classroom with 5 topics'
+        classroom_name_2 = 'Dummy Classroom with 1 topic'
+
+        classroom_url_fragment_1 = 'first-classroom'
+        classroom_url_fragment_2 = 'second-classroom'
+
+        topic_dependency_for_classroom_1: Dict[str, list[str]] = {
+            topic_id_1: [],
+            topic_id_2: [topic_id_1],
+            topic_id_3: [topic_id_1],
+            topic_id_4: [topic_id_2],
+            topic_id_5: [topic_id_3]
+        }
+        topic_dependency_for_classroom_2: Dict[str, List[str]] = {
+            topic_id_6: []
+        }
+
+        classroom_dict_1: classroom_config_domain.ClassroomDict = {
+            'classroom_id': classroom_id_1,
+            'name': classroom_name_1,
+            'url_fragment': classroom_url_fragment_1,
+            'course_details': '',
+            'topic_list_intro': '',
+            'topic_id_to_prerequisite_topic_ids': (
+                topic_dependency_for_classroom_1)
+        }
+        classroom_dict_2: classroom_config_domain.ClassroomDict = {
+            'classroom_id': classroom_id_2,
+            'name': classroom_name_2,
+            'url_fragment': classroom_url_fragment_2,
+            'course_details': '',
+            'topic_list_intro': '',
+            'topic_id_to_prerequisite_topic_ids': (
+                topic_dependency_for_classroom_2)
+        }
+
+        classroom_1 = classroom_config_domain.Classroom.from_dict(
+            classroom_dict_1)
+        classroom_2 = classroom_config_domain.Classroom.from_dict(
+            classroom_dict_2)
+
+        classroom_config_services.update_or_create_classroom_model(
+            classroom_1)
+        classroom_config_services.update_or_create_classroom_model(
+            classroom_2)
 
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
@@ -1195,7 +1195,7 @@ class TopicManagerRoleHandler(
 
         user_id = user_settings.user_id
         if action == 'assign':
-            if not feconf.ROLE_ID_TOPIC_MANAGER in user_settings.roles:
+            if feconf.ROLE_ID_TOPIC_MANAGER not in user_settings.roles:
                 user_services.add_user_role(
                     user_id, feconf.ROLE_ID_TOPIC_MANAGER)
 
@@ -1443,15 +1443,16 @@ class DataExtractionQueryHandler(
     @acl_decorators.can_access_admin_page
     def get(self) -> None:
         assert self.normalized_request is not None
-        exp_id = self.normalized_request['exp_id']
         exp_version = self.normalized_request['exp_version']
 
+        exp_id = self.normalized_request['exp_id']
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
         if exploration is None:
             raise self.InvalidInputException(
-                'Entity for exploration with id %s and version %s not found.'
-                % (exp_id, exp_version))
+                f'Entity for exploration with id {exp_id} and version {exp_version} not found.'
+            )
+
 
         state_name = self.normalized_request['state_name']
         num_answers = self.normalized_request['num_answers']
@@ -1465,11 +1466,9 @@ class DataExtractionQueryHandler(
             exp_id, exp_version, state_name)
         if state_answers is None:
             raise Exception(
-                'No state answer exists for the given exp_id: %s,'
-                ' exp_version: %s and state_name: %s' %
-                (exp_id, exp_version, state_name)
-
+                f'No state answer exists for the given exp_id: {exp_id}, exp_version: {exp_version} and state_name: {state_name}'
             )
+
         extracted_answers = state_answers.get_submitted_answer_dict_list()
 
         if num_answers > 0:
@@ -1545,8 +1544,7 @@ class UpdateUsernameHandler(
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
-            raise self.InvalidInputException(
-                'Invalid username: %s' % old_username)
+            raise self.InvalidInputException(f'Invalid username: {old_username}')
 
         if user_services.is_username_taken(new_username):
             raise self.InvalidInputException('Username already taken.')
@@ -1718,8 +1716,7 @@ class UpdateBlogPostHandler(
 
         author_id = user_services.get_user_id_from_username(author_username)
         if author_id is None:
-            raise self.InvalidInputException(
-                'Invalid username: %s' % author_username)
+            raise self.InvalidInputException(f'Invalid username: {author_username}')
 
         user_actions = user_services.get_user_actions_info(author_id).actions
         if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:

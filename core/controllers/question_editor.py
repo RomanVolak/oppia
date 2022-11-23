@@ -135,16 +135,18 @@ class QuestionCreationHandler(
                     'Image not provided for file with name %s when the question'
                     ' with id %s was created.' % (filename, question.id))
                 raise self.InvalidInputException(
-                    'No image data provided for file with name %s. %s'
-                    % (filename, image_validation_error_message_suffix))
+                    f'No image data provided for file with name {filename}. {image_validation_error_message_suffix}'
+                )
+
             try:
                 file_format = (
                     image_validation_services.validate_image_and_filename(
                         image, filename))
             except utils.ValidationError as e:
                 raise self.InvalidInputException(
-                    '%s %s' % (e, image_validation_error_message_suffix)
+                    f'{e} {image_validation_error_message_suffix}'
                 )
+
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
